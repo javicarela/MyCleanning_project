@@ -1,24 +1,26 @@
 #Download the file to our environment
-if(!file.exists("./data")){dir.create("./data")}
-fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
-download.file(fileUrl,destfile="./data/Dataset.zip",method="curl")
+filename <- "Coursera_DS3_Final.zip"
 
-#Unzip the file that we download
-unzip(zipfile="./data/Dataset.zip",exdir="./data")
+# Checking if archieve already exists.
+if (!file.exists(filename)){
+  fileURL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+  download.file(fileURL, filename, method="curl")
+}  
 
-path_rf <- file.path("./data" , "UCI HAR Dataset")
-files<-list.files(path_rf, recursive=TRUE)
-files
+# Checking if folder exists
+if (!file.exists("UCI HAR Dataset")) { 
+  unzip(filename) 
+}
 # We download the final dataset zip
 
 features <- read.table("UCI HAR Dataset/features.txt", col.names = c("n","functions"))
 activities <- read.table("UCI HAR Dataset/activity_labels.txt", col.names = c("code", "activity"))
 # TEST #
-sub_test <- read.table("UCI HAR Dataset/test/subject_test.txt", col.names = "subject")
+subject_test <- read.table("UCI HAR Dataset/test/subject_test.txt", col.names = "subject")
 x_test <- read.table("UCI HAR Dataset/test/X_test.txt", col.names = features$functions)
 y_test <- read.table("UCI HAR Dataset/test/y_test.txt", col.names = "code")
 # TRAIN #
-sub_train <- read.table("UCI HAR Dataset/train/subject_train.txt", col.names = "subject")
+subject_train <- read.table("UCI HAR Dataset/train/subject_train.txt", col.names = "subject")
 x_train <- read.table("UCI HAR Dataset/train/X_train.txt", col.names = features$functions)
 y_train <- read.table("UCI HAR Dataset/train/y_train.txt", col.names = "code")
 
@@ -28,12 +30,12 @@ y_train <- read.table("UCI HAR Dataset/train/y_train.txt", col.names = "code")
 
 x_data <- rbind(x_train, x_test) # one object
 y_data <- rbind(y_train, y_test) # one object
-sub <- rbind(sub_train, sub_test) # one object
-Merged_Data <- cbind(sub, y_data, x_data) # One object of the three
+subject <- rbind(subject_train, subject_test) # one object
+Merged_Data <- cbind(subject, y_data, x_data) # One object of the three
 
 #Extracts only the measurements on the mean and standard deviation for each measurement.
-
-TidyData <- Merged_Data %>% select(sub, code, contains("mean"), contains("std")) # Get the mean and the st desviation
+library(dplyr)
+TidyData <- Merged_Data %>% select(subject, code, contains("mean"), contains("std")) # Get the mean and the st desviation
 
 #Uses descriptive activity names to name the activities in the data set.
 
@@ -61,8 +63,10 @@ names(TidyData)<-gsub("gravity", "Gravity", names(TidyData))
 
 # Finally, we can write the tidy_dataset-txt using the following function, with the help of  %>% operator:
 tidy_dataset <- TidyData %>%
-  group_by(sub, activity) %>%
+  group_by(subject, activity) %>%
   summarise_all(funs(mean))
 write.table(tidy_dataset, "tidy_dataset", row.name=FALSE)
 
 str(tidy_dataset)
+dim(tidy_dataset) # 180 obs  and 88 variables
+summary(tidy_dataset) #we can check that we haven't got any strange value'
