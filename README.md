@@ -1,7 +1,7 @@
 # MyCleanning_project
 
 - This is my final coursera project in : Getting and Cleaning Data .
-- I include in my repository the *run_analysis.R* script  where i made the project following the steps descrives in the *CodeBOOK.md* file.
+- I include in my repository the *run_analysis.R* script  where i made the project following the steps descrives in the *CodeBOOK.md* file
 
 # Transformations
 **1.** *Merges the training and the test sets to create one data set.*
